@@ -17,16 +17,16 @@ const GradeGenerator = () => {
   return (
     <>
       <Navbar />
-      <div className="grade-generator min-h-screen bg-gradient-to-br from-sky-100 to-sky-300 flex items-center justify-center py-24 px-6 lg:px-8 overflow-hidden">
+      <div className="grade-generator min-h-screen bg-gradient-to-r from-gray-100 via-gray-200 to-gray-300 flex items-center justify-center py-24 px-6 lg:px-8 overflow-hidden">
         <div
-          className={`card bg-white shadow-2xl rounded-3xl p-12 max-w-3xl w-full ${
+          className={`card bg-white shadow-2xl rounded-xl p-12 max-w-3xl w-full ${
             isCardHovered ? "scale-105" : ""
           } transition-transform duration-300 ease-in-out`}
           onMouseEnter={handleCardHover}
           onMouseLeave={handleCardLeave}
         >
           <h1 className="text-4xl font-bold text-sky-900 mb-8 text-center">
-            Grade Generator
+            GradeWiz
             <span className="text-lg font-medium text-gray-600 block">
               Upload your PDF and generate grades with ease!
             </span>
