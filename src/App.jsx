@@ -4,6 +4,7 @@ import Register from "./components/Register";
 import LandingPage from "./components/LandingPage";
 import Navbar from "./components/Navbar";
 import Home from "./components/Home";
+import GenerateQuestions from "./components/GenerateQuestions";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="" element={<Home />} />
         <Route path="home" element={<Home />} />
         <Route path="" element={<Home />} />
+        <Route path="generateQuestions" element={<GenerateQuestions />} />
 
         <Route path="landingpage" element={<LandingPage />} />
 
