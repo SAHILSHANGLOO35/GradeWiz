@@ -3,6 +3,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
 import Navbar from "./Navbar";
 
+//Small change
+
 const GradeGenerator = () => {
   const [isCardHovered, setIsCardHovered] = useState(false);
   const [prompt, setPrompt] = useState("");
