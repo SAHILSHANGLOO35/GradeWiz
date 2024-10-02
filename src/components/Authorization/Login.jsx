@@ -28,7 +28,7 @@ function Login() {
       // Set isAdmin based on user type
       localStorage.setItem("isAdmin", userType === "admin");
 
-      navigate("/home"); // Redirect to home page
+      navigate("/teams"); // Redirect to home page
     } catch (error) {
       console.error("An error occurred during login:", error);
       alert(error.response?.data?.message || "Login failed. Please try again.");
@@ -56,7 +56,7 @@ function Login() {
               </label>
               <label className="transition duration-500 ease-in-out hover:text-blue-500">
                 <input
-                  type="radio"
+                  type="radio"a
                   value="admin"
                   checked={userType === "admin"}
                   onChange={() => setUserType("admin")}

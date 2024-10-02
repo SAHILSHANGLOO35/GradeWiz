@@ -1,9 +1,6 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
-import Navbar from "./Navbar";
-
-//Small change
 
 const GradeGenerator = () => {
   const [isCardHovered, setIsCardHovered] = useState(false);
@@ -44,7 +41,6 @@ const GradeGenerator = () => {
 
   return (
     <>
-      <Navbar />
       <div className="grade-generator min-h-screen bg-gradient-to-br from-sky-100 to-sky-300 flex items-center justify-center py-24 px-6 lg:px-8 overflow-hidden">
         <div
           className={`card bg-white shadow-2xl rounded-3xl p-12 max-w-3xl w-full ${

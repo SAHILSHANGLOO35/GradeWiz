@@ -25,7 +25,7 @@ function Signup() {
     const dataToSend = userType === "user" 
       ? formData 
       : {
-          name: formData.adminName, // Add adminName
+          name: formData.adminName,
           email: formData.adminEmail, 
           password: formData.adminPassword 
         };
@@ -45,15 +45,14 @@ function Signup() {
     }
 };
 
-
   return (
     <div className="flex items-center justify-center h-screen bg-gradient-to-r from-gray-100 via-gray-200 to-gray-300">
-      <div className="bg-white border border-slate-300 rounded-xl p-10 shadow-xl backdrop-filter backdrop-blur-sm bg-opacity-70 relative w-full max-w-lg transition duration-500 transform hover:scale-105">
-        <h1 className="text-4xl text-sky-900 font-bold text-center mb-6 transition duration-500">Signup</h1>
+      <div className="bg-white border border-slate-300 rounded-xl p-10 shadow-xl backdrop-filter backdrop-blur-sm bg-opacity-70 relative w-full max-w-lg">
+        <h1 className="text-4xl text-sky-900 font-bold text-center mb-6">Signup</h1>
 
-        <form onSubmit={handleSubmit} className="transition duration-500 ease-in-out transform hover:scale-105">
+        <form onSubmit={handleSubmit}>
           <div className="flex gap-4 mb-6">
-            <label className="transition duration-500 ease-in-out hover:text-blue-500">
+            <label>
               <input
                 type="radio"
                 value="user"
@@ -63,7 +62,7 @@ function Signup() {
               />
               User
             </label>
-            <label className="transition duration-500 ease-in-out hover:text-blue-500">
+            <label>
               <input
                 type="radio"
                 value="admin"
@@ -90,7 +89,7 @@ function Signup() {
                 />
                 <label
                   htmlFor="name"
-                  className="absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-4 left-0 origin-[0] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 peer-focus:text-blue-600"
+                  className="absolute text-sm text-gray-500 top-4 left-0"
                 >
                   Your Name
                 </label>
@@ -109,7 +108,7 @@ function Signup() {
                 />
                 <label
                   htmlFor="rollNo"
-                  className="absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-4 left-0 origin-[0] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 peer-focus:text-blue-600"
+                  className="absolute text-sm text-gray-500 top-4 left-0"
                 >
                   Your Roll Number
                 </label>
@@ -128,7 +127,7 @@ function Signup() {
                 />
                 <label
                   htmlFor="email"
-                  className="absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-4 left-0 origin-[0] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 peer-focus:text-blue-600"
+                  className="absolute text-sm text-gray-500 top-4 left-0"
                 >
                   Your Email
                 </label>
@@ -147,7 +146,7 @@ function Signup() {
                 />
                 <label
                   htmlFor="password"
-                  className="absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-4 left-0 origin-[0] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 peer-focus:text-blue-600"
+                  className="absolute text-sm text-gray-500 top-4 left-0"
                 >
                   Your Password
                 </label>
@@ -166,7 +165,7 @@ function Signup() {
                 />
                 <label
                   htmlFor="mobile"
-                  className="absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-4 left-0 origin-[0] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 peer-focus:text-blue-600"
+                  className="absolute text-sm text-gray-500 top-4 left-0"
                 >
                   Your Mobile Number
                 </label>
@@ -185,7 +184,7 @@ function Signup() {
                 />
                 <label
                   htmlFor="branch"
-                  className="absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-4 left-0 origin-[0] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 peer-focus:text-blue-600"
+                  className="absolute text-sm text-gray-500 top-4 left-0"
                 >
                   Your Branch
                 </label>
@@ -231,7 +230,7 @@ function Signup() {
       />
       <label
         htmlFor="adminName"
-        className="absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-4 left-0 origin-[0] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 peer-focus:text-blue-600"
+        className="absolute text-sm text-gray-500 top-4 left-0"
       >
         Admin Name
       </label>
@@ -250,11 +249,10 @@ function Signup() {
       />
       <label
         htmlFor="adminEmail"
-        className="absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-4 left-0 origin-[0] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 peer-focus:text-blue-600"
+        className="absolute text-sm text-gray-500 top-4 left-0"
       >
         Admin Email
       </label>
-      <HiOutlineMail className="absolute top-4 right-4 text-gray-400 text-xl" />
     </div>
     
     <div className="relative my-2">
@@ -270,30 +268,27 @@ function Signup() {
       />
       <label
         htmlFor="adminPassword"
-        className="absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-4 left-0 origin-[0] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 peer-focus:text-blue-600"
+        className="absolute text-sm text-gray-500 top-4 left-0"
       >
         Admin Password
       </label>
-      <AiOutlineUnlock className="absolute top-4 right-4 text-gray-400 text-xl" />
     </div>
   </div>
 )}
 
-          <div className="mb-4">
-            <button
-              type="submit"
-              className="border-2 border-sky-900 w-full text-lg rounded-full bg-sky-900 text-white hover:bg-sky-700 py-3 transition-colors duration-300"
-            >
-              Signup
-            </button>
-          </div>
-        </form>
+          <button
+            type="submit"
+            className="w-full text-white bg-sky-900 font-medium rounded-lg text-sm py-2.5 text-center mt-6"
+          >
+            Sign up
+          </button>
 
-        {notification && (
-          <div className="mt-4 p-2 text-center text-red-600">
-            {notification}
-          </div>
-        )}
+          {notification && (
+            <div className="text-center text-green-500 mt-4">
+              {notification}
+            </div>
+          )}
+        </form>
       </div>
     </div>
   );

@@ -1,10 +1,8 @@
-import Navbar from "./Navbar";
 import FormImage from "../assets/Form.png";
 
 function LandingPage() {
   return (
     <>
-      <Navbar />
       <div className="bg-white">
         <div className="container mx-auto py-28 px-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mt-9">
