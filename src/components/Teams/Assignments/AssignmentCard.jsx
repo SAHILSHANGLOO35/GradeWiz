@@ -9,7 +9,6 @@ const AssignmentCard = ({ title, dueDate, timestamp }) => {
         </div>
         <div className="flex-grow">
           <div className="flex items-center justify-between">
-            <span className="text-gray-900 font-medium">Assignments</span>
             <span className="text-gray-500 text-sm">{timestamp}</span>
           </div>
         </div>
