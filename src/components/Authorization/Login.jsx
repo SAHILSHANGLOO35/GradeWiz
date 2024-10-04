@@ -16,9 +16,9 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const url = userType === "user" 
-      ? "http://127.0.0.1:8000/api/v1/user/signin" 
-      : "http://127.0.0.1:8000/api/v1/admin/signin";
+    const url =
+      "http://127.0.0.1:8000/api/v1/user/signin"
+
 
     try {
       const response = await axios.post(url, formData);
@@ -56,7 +56,7 @@ function Login() {
               </label>
               <label className="transition duration-500 ease-in-out hover:text-blue-500">
                 <input
-                  type="radio"a
+                  type="radio" a
                   value="admin"
                   checked={userType === "admin"}
                   onChange={() => setUserType("admin")}

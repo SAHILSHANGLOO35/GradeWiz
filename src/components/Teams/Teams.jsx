@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate    
-import TeamCard from './TeamCard';  
-import Modal from './Modal';     
+import TeamCard from './TeamCard';
+import Modal from './Modal';
 
 function Teams() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [teamName, setTeamName] = useState('');
+  const [teamDesc, setTeamDesc] = useState('');
+  const [msg, setMsg] = useState("")
   const navigate = useNavigate(); // Initialize useNavigate
 
   const [teams] = useState([
@@ -24,7 +27,23 @@ function Teams() {
 
   const handleTeamClick = (abbreviation, color, title) => {
     navigate(`/team-detail-view/${abbreviation}`, { state: { abbreviation, color, title } }); // Pass title along with abbreviation and color
-  };  
+  };
+
+  async function handleTeamCreate() {
+
+    const req = await fetch(`http://127.0.0.1:8000/api/v1/team/create`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Authorization": `${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify({ teamName, descritpion: teamDesc })
+    });
+    const res = await req.json();
+
+    setMsg(res.message);
+  }
 
   return (
     <>
@@ -34,7 +53,10 @@ function Teams() {
           <div>
             {isAdmin ? (
               <button
-                onClick={() => setIsCreateModalOpen(true)}
+                onClick={() => {
+                  setIsCreateModalOpen(true);
+
+                }}
                 className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors flex items-center"
               >
                 <span className="mr-2">+</span>
@@ -57,11 +79,11 @@ function Teams() {
             <h2 className="text-lg font-semibold mb-2">Classes</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {teams.map((team) => (
-                <TeamCard 
-                key={team.id} 
-                {...team} 
-                onClick={() => handleTeamClick(team.abbreviation, team.color, team.title)} // Pass abbreviation, color, and title
-              />              
+                <TeamCard
+                  key={team.id}
+                  {...team}
+                  onClick={() => handleTeamClick(team.abbreviation, team.color, team.title)} // Pass abbreviation, color, and title
+                />
               ))}
             </div>
           </div>
@@ -72,11 +94,11 @@ function Teams() {
             <h2 className="text-lg font-semibold mb-2">My Teams</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {teams.slice(0, 2).map((team) => (
-                <TeamCard 
-                key={team.id} 
-                {...team} 
-                onClick={() => handleTeamClick(team.abbreviation, team.color, team.title)} // Pass abbreviation, color, and title
-              />              
+                <TeamCard
+                  key={team.id}
+                  {...team}
+                  onClick={() => handleTeamClick(team.abbreviation, team.color, team.title)} // Pass abbreviation, color, and title
+                />
               ))}
             </div>
           </div>
@@ -114,17 +136,20 @@ function Teams() {
             </p>
             <input
               type="text"
+              onChange={(e) => setTeamName(e.target.value)}
               placeholder="Team name"
               className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <input
               type="text"
+              onChange={(e) => setTeamDesc(e.target.value)}
               placeholder="Team description"
               className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <button className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors">
+            <button onClick={handleTeamCreate} className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors">
               Create Team
             </button>
+            {msg.length !== 0 && <h1>{msg}</h1>}
           </div>
         </Modal>
       </div>
