@@ -1,6 +1,19 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const AssignmentCard = ({ title, dueDate, timestamp }) => {
+const AssignmentCard = ({ title, dueDate, timestamp, isAdmin, teamId, testId }) => {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    if (isAdmin) {
+      // Navigate to the results page with the teamId and testId in the URL
+      navigate(`/team/${teamId}/test/${testId}/results`);
+    } else {
+      // Normal test view for non-admins (can be expanded later)
+      console.log('View Test clicked');
+    }
+  };
+
   return (
     <div className="border rounded-lg shadow-sm mb-4 bg-white">
       <div className="flex items-center p-4 border-b">
@@ -17,8 +30,11 @@ const AssignmentCard = ({ title, dueDate, timestamp }) => {
       <div className="p-4">
         <h3 className="text-gray-900 text-lg font-medium mb-2">{title}</h3>
         <p className="text-gray-600 mb-3">Due {dueDate}</p>
-        <button className="bg-gray-100 text-gray-700 px-4 py-2 rounded hover:bg-gray-200 transition-colors">
-          View Test
+        <button 
+          onClick={handleClick} 
+          className="bg-gray-100 text-gray-700 px-4 py-2 rounded hover:bg-gray-200 transition-colors"
+        >
+          {isAdmin ? 'View Result' : 'View Test'}
         </button>
       </div>
     </div>
