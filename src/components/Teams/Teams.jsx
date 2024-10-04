@@ -9,28 +9,49 @@ function Teams() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [teamName, setTeamName] = useState('');
   const [teamDesc, setTeamDesc] = useState('');
-  const [msg, setMsg] = useState("")
+  const [msg, setMsg] = useState("");
+  const [teams, setTeams] = useState([]); // Initialize state to store fetched teams
   const navigate = useNavigate(); // Initialize useNavigate
 
-  const [teams] = useState([
-    { id: 1, title: 'TE EM-5 INFT-A-2024', abbreviation: 'TE', color: '#8B5CF6' },
-    { id: 2, title: 'Scholarship INFT', abbreviation: 'SI', color: '#3B82F6' },
-    { id: 3, title: 'INFT_DWM_Lab_Div A_Batch 2', abbreviation: 'IA', color: '#059669' },
-    { id: 4, title: 'ADSA Lab TE INFT A Batch 2', abbreviation: 'AL', color: '#EC4899' },
-    { id: 5, title: 'ADSA_INFT_V_DIV A_2024_2025', abbreviation: 'AA', color: '#6B7280' },
-  ]);
+  const colorArray = ['#8B5CF6', '#3B82F6', '#059669', '#EC4899', '#6B7280']; // Array of colors
 
   useEffect(() => {
     const adminStatus = localStorage.getItem('isAdmin');
     setIsAdmin(adminStatus === 'true');
-  }, []);
+
+    // Fetch teams created by admin
+    async function fetchTeams() {
+      try {
+        const response = await fetch('http://127.0.0.1:8000/api/v1/all-teams', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `${localStorage.getItem('token')}`
+          }
+        });
+
+        const data = await response.json();
+        console.log(data);
+        
+        if (response.ok) {
+          setTeams(data.teams); // Set fetched teams in the state
+        } else {
+          setMsg(data.message || 'Failed to fetch teams');
+        }
+      } catch (error) {
+        console.error('Error fetching teams:', error);
+        setMsg('Error fetching teams');
+      }
+    }
+
+    fetchTeams();
+  }, [msg]);
 
   const handleTeamClick = (abbreviation, color, title) => {
-    navigate(`/team-detail-view/${abbreviation}`, { state: { abbreviation, color, title } }); // Pass title along with abbreviation and color
+    navigate(`/team-detail-view/${abbreviation}`, { state: { abbreviation, color, title } });
   };
 
   async function handleTeamCreate() {
-
     const req = await fetch(`http://127.0.0.1:8000/api/v1/team/create`, {
       method: "POST",
       headers: {
@@ -38,12 +59,20 @@ function Teams() {
         "Accept": "application/json",
         "Authorization": `${localStorage.getItem('token')}`
       },
-      body: JSON.stringify({ teamName, descritpion: teamDesc })
+      body: JSON.stringify({ teamName, description: teamDesc })
     });
-    const res = await req.json();
 
+    const res = await req.json();
     setMsg(res.message);
   }
+
+  const generateAbbreviation = (teamName) => {
+    return teamName.slice(0, 2).toUpperCase(); // Take first two letters of team name and uppercase them
+  };
+
+  const getRandomColor = () => {
+    return colorArray[Math.floor(Math.random() * colorArray.length)]; // Pick a random color from the array
+  };
 
   return (
     <>
@@ -55,7 +84,6 @@ function Teams() {
               <button
                 onClick={() => {
                   setIsCreateModalOpen(true);
-
                 }}
                 className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors flex items-center"
               >
@@ -80,9 +108,11 @@ function Teams() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {teams.map((team) => (
                 <TeamCard
-                  key={team.id}
-                  {...team}
-                  onClick={() => handleTeamClick(team.abbreviation, team.color, team.title)} // Pass abbreviation, color, and title
+                  key={team._id}
+                  abbreviation={generateAbbreviation(team.name)}
+                  color={getRandomColor()}
+                  title={team.name}
+                  onClick={() => handleTeamClick(generateAbbreviation(team.name), getRandomColor(), team.name)}
                 />
               ))}
             </div>
@@ -93,11 +123,13 @@ function Teams() {
           <div>
             <h2 className="text-lg font-semibold mb-2">My Teams</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {teams.slice(0, 2).map((team) => (
+              {teams.map((team) => (
                 <TeamCard
-                  key={team.id}
-                  {...team}
-                  onClick={() => handleTeamClick(team.abbreviation, team.color, team.title)} // Pass abbreviation, color, and title
+                  key={team._id}
+                  abbreviation={generateAbbreviation(team.teamName)}
+                  color={getRandomColor()}
+                  title={team.teamName}
+                  onClick={() => handleTeamClick(generateAbbreviation(team.teamName), getRandomColor(), team.teamName)}
                 />
               ))}
             </div>

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import AssignmentCard from './Assignments/AssignmentCard';
 
+
+
 const assignments = [
   { id: 1, title: 'Test 1', dueDate: 'Aug 3', timestamp: '8/2 3:23 PM' },
   { id: 2, title: 'Test 2', dueDate: 'Aug 8', timestamp: '7/25 11:39 AM' },
@@ -24,6 +26,8 @@ function TeamDetailView() {
   const [copySuccess, setCopySuccess] = useState(''); // For displaying copy status
   const navigate = useNavigate();
   const location = useLocation();
+  const [teamCode, setTeamCode] = useState('');
+  const [msg, setMsg] = useState('');
 
   const { abbreviation: passedAbbreviation, color: passedColor, title } = location.state || {};
 
@@ -32,8 +36,39 @@ function TeamDetailView() {
     setIsAdmin(adminStatus === 'true');
   }, []);
 
-  // Hardcoded team code for now, can replace this with your generation logic
-  const teamCode = 'A1B2C3';
+  useEffect(() => {
+    const adminStatus = localStorage.getItem('isAdmin');
+    setIsAdmin(adminStatus === 'true');
+
+    // Fetch teams created by admin
+    async function fetchTeams() {
+      try {
+        const response = await fetch('http://127.0.0.1:8000/api/v1/all-teams', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `${localStorage.getItem('token')}`
+          }
+        });
+
+        const data = await response.json();
+        console.log(data);
+
+        
+        if (response.ok) {
+          setTeamCode(data.teams); // Set fetched teams in the state
+        } else {
+          setMsg(data.message || 'Failed to fetch teams');
+        }
+      } catch (error) {
+        console.error('Error fetching teams:', error);
+        setMsg('Error fetching teams');
+      }
+    }
+
+    fetchTeams();
+  }, [msg]);
+
 
   // Function to handle copying the team code to clipboard
   const copyToClipboard = () => {
@@ -106,9 +141,9 @@ function TeamDetailView() {
       <div className="pt-40 px-6">
         {activeTab === 'posts' && (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {assignments.map(assignment => (
+          {/* {assignments.map(assignment => (
             <AssignmentCard key={assignment.id} {...assignment} isAdmin={isAdmin} />
-          ))}
+          ))} */}
         </div>
         )}
         
@@ -124,7 +159,7 @@ function TeamDetailView() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {members.map((member, index) => (
+                {/* {members.map((member, index) => (
                   <tr key={index}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{member.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{member.rollNo}</td>
@@ -135,7 +170,7 @@ function TeamDetailView() {
                       </button>
                     </td>
                   </tr>
-                ))}
+                ))} */}
               </tbody>
             </table>
           </div>
