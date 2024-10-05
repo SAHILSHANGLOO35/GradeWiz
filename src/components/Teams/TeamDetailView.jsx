@@ -4,21 +4,21 @@ import AssignmentCard from './Assignments/AssignmentCard';
 
 
 
-const assignments = [
-  { id: 1, title: 'Test 1', dueDate: 'Aug 3', timestamp: '8/2 3:23 PM' },
-  { id: 2, title: 'Test 2', dueDate: 'Aug 8', timestamp: '7/25 11:39 AM' },
-  { id: 3, title: 'Test 3', dueDate: 'Aug 16', timestamp: '8/9 10:10 AM' },
-  { id: 4, title: 'Test 4', dueDate: 'Aug 3', timestamp: '8/2 3:23 PM' },
-  { id: 5, title: 'Test 5', dueDate: 'Aug 8', timestamp: '7/25 11:39 AM' },
-  { id: 6, title: 'Test 6', dueDate: 'Aug 16', timestamp: '8/9 10:10 AM' }
-];
+// const assignments = [
+//   { id: 1, title: 'Test 1', dueDate: 'Aug 3', timestamp: '8/2 3:23 PM' },
+//   { id: 2, title: 'Test 2', dueDate: 'Aug 8', timestamp: '7/25 11:39 AM' },
+//   { id: 3, title: 'Test 3', dueDate: 'Aug 16', timestamp: '8/9 10:10 AM' },
+//   { id: 4, title: 'Test 4', dueDate: 'Aug 3', timestamp: '8/2 3:23 PM' },
+//   { id: 5, title: 'Test 5', dueDate: 'Aug 8', timestamp: '7/25 11:39 AM' },
+//   { id: 6, title: 'Test 6', dueDate: 'Aug 16', timestamp: '8/9 10:10 AM' }
+// ];
 
-const members = [
-  { name: 'Arkan Khan', rollNo: '22101A0049', branch: 'INFT' },
-  { name: 'Anuj Gill', rollNo: '22101A0057', branch: 'INFT' },
-  { name: 'Om Alve', rollNo: '22101A0073', branch: 'INFT' },
-  { name: 'Sahil Shangloo', rollNo: '22101A0027', branch: 'INFT' },
-];
+// const members = [
+//   { name: 'Arkan Khan', rollNo: '22101A0049', branch: 'INFT' },
+//   { name: 'Anuj Gill', rollNo: '22101A0057', branch: 'INFT' },
+//   { name: 'Om Alve', rollNo: '22101A0073', branch: 'INFT' },
+//   { name: 'Sahil Shangloo', rollNo: '22101A0027', branch: 'INFT' },
+// ];
 
 function TeamDetailView() {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -52,11 +52,14 @@ function TeamDetailView() {
         });
 
         const data = await response.json();
-        console.log(data);
-
+        console.log(data)
         
         if (response.ok) {
-          setTeamCode(data.teams); // Set fetched teams in the state
+          data.teams.map((team,index) => {
+            if(team.teamName === title){
+              setTeamCode(team.creationCode)
+            }
+          }) // Set fetched teams in the state
         } else {
           setMsg(data.message || 'Failed to fetch teams');
         }
