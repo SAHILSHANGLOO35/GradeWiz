@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CalendarIcon } from "lucide-react";
 import { useLocation } from 'react-router-dom';
 
@@ -6,21 +6,21 @@ const TestCreator = () => {
   const [testTitle, setTestTitle] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [answers, setAnswers] = useState({});
+  const [backendMessage, setBackendMessage] = useState(''); // State to store backend message
+  const [showModal, setShowModal] = useState(false); // State for modal visibility
+
   const location = useLocation();
-  const questions = location.state?.questions; // Retrieve questions from location state
+  const questions = location.state?.questions;
+  const teamCode = location.state?.teamCode;
 
-  console.log("Raw Questions:", questions); // Log the raw questions data
-
-  // Parse questions safely
   const parseQuestions = () => {
-    if (Array.isArray(questions)) return questions; // Return if already an array
+    if (Array.isArray(questions)) return questions;
     try {
-      // Check if questions is a valid JSON string and sanitize it
-      const sanitizedQuestions = questions.replace(/`/g, '').trim(); // Remove backticks
-      return JSON.parse(sanitizedQuestions); // Try parsing the sanitized string
+      const sanitizedQuestions = questions.replace(/`/g, '').trim();
+      return JSON.parse(sanitizedQuestions);
     } catch (e) {
       console.error('Error parsing questions:', e);
-      return []; // Return an empty array if parsing fails
+      return [];
     }
   };
 
@@ -29,20 +29,49 @@ const TestCreator = () => {
   const handleAnswerChange = (index, value) => {
     setAnswers({
       ...answers,
-      [index]: value // Update answers based on index
+      [index]: value
     });
   };
 
-  const handlePublish = () => {
+  const handlePublish = async () => {
     const testData = {
       title: testTitle,
-      dueDate,
+      duedate: dueDate,
       questions: questionsArray,
-      answers
+      teamCode
     };
-    // Call the onPublish function with test data (make sure to define it)
-    console.log("Test Data to Publish:", testData); // Placeholder for testing
+    
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/v1/tests/create-test', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(testData)
+      });
+  
+      const data = await response.json();
+      
+      // Show the response message in the modal
+      setBackendMessage(data.message || 'Test created successfully!');
+      setShowModal(true);
+
+      // Hide the modal after 3 seconds
+      setTimeout(() => {
+        setShowModal(false);
+      }, 3000);
+    } catch (error) {
+      console.error('Error creating test:', error);
+      setBackendMessage('Failed to create test.');
+      setShowModal(true);
+      setTimeout(() => {
+        setShowModal(false);
+      }, 3000);
+    }
   };
+
+  [{question:"", answer: ""},{question: "", answer: ""}]
 
   return (
     <div className="space-y-6">
@@ -98,6 +127,15 @@ const TestCreator = () => {
           Publish Test
         </button>
       </div>
+
+      {/* Modal for Backend Message */}
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <p>{backendMessage}</p>
+          </div>
+        </div>
+      )}
 
       {/* Preview Assignment Card */}
       {testTitle && dueDate && (

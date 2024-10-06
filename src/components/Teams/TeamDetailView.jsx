@@ -131,7 +131,7 @@ function TeamDetailView() {
 
         {isAdmin && (
           <button 
-            onClick={() => navigate('/generateQuestions')}
+            onClick={() => navigate('/generateQuestions', { state: { teamCode } })}
             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors flex items-center ml-4"
           >
             <span className="mr-2">✏️</span>

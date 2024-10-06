@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
-import { useNavigate } from "react-router-dom";  // Import useNavigate for routing
+import { useNavigate, useLocation } from "react-router-dom";  // Import useNavigate for routing
 import TestCreator from './Teams/Assignments/TestCreate';
 
 const GradeGenerator = () => {
@@ -9,8 +9,10 @@ const GradeGenerator = () => {
   const [llmResponse, setLlmResponse] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [testCreated, setTestCreated] = useState(false);
-
+  const location = useLocation();
   const navigate = useNavigate();  // Initialize the useNavigate hook
+  const teamCode = location.state?.teamCode;
+  console.log(teamCode)
 
   function handleGenerate(e) {
     e.preventDefault();
@@ -27,18 +29,31 @@ const GradeGenerator = () => {
     };
 
     fetch("http://127.0.0.1:5000/summarize", requestOptions)
-      .then((response) => response.json())
-      .then((result) => {
-        console.log(result);
-        setLlmResponse(result.Questions);
-        setTestCreated(false);
-      })
-      .catch((error) => console.error(error));
+  .then((response) => response.json())
+  .then((result) => {
+    // Extract the 'Questions' string
+    let questionsString = result.Questions;
+
+    // Remove backticks and 'json' tag
+    questionsString = questionsString.replace(/```json|```/g, "").trim();
+
+    // Parse the cleaned string as JSON
+    const questionsArray = JSON.parse(questionsString);
+
+    // Set the array of question objects into state (unchanged structure)
+    setLlmResponse(questionsArray);
+    setTestCreated(false);
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+  });
+
+
   }
 
   const handleCreateTest = () => {
     // Navigate to TestCreate component with llmResponse as state
-    navigate("/test-create", { state: { questions: llmResponse } });
+    navigate("/test-create", { state: { questions: llmResponse, teamCode } });
   };
 
   const handlePublishTest = (testData) => {
@@ -156,7 +171,7 @@ const GradeGenerator = () => {
             )}
           </>
         ) : (
-          <TestCreator 
+          <TestCreator
             questions={llmResponse}
             onPublish={handlePublishTest}
           />
