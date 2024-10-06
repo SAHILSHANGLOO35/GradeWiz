@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate    
+import { useNavigate } from 'react-router-dom';    
 import TeamCard from './TeamCard';
 import Modal from './Modal';
 
@@ -10,6 +10,7 @@ function Teams() {
   const [teamName, setTeamName] = useState('');
   const [teamDesc, setTeamDesc] = useState('');
   const [msg, setMsg] = useState("");
+  const [teamCode, setTeamCode] = useState(''); // Changed state for join code to teamCode
   const [teams, setTeams] = useState([]); // Initialize state to store fetched teams
   const navigate = useNavigate(); // Initialize useNavigate
 
@@ -19,7 +20,6 @@ function Teams() {
     const adminStatus = localStorage.getItem('isAdmin');
     setIsAdmin(adminStatus === 'true');
 
-    // Fetch teams created by admin
     async function fetchTeams() {
       try {
         const response = await fetch('http://127.0.0.1:8000/api/v1/all-teams', {
@@ -34,7 +34,7 @@ function Teams() {
         console.log(data);
         
         if (response.ok) {
-          setTeams(data.teams); // Set fetched teams in the state
+          setTeams(data.teams);
         } else {
           setMsg(data.message || 'Failed to fetch teams');
         }
@@ -64,19 +64,45 @@ function Teams() {
 
     const res = await req.json();
     setMsg(res.message);
+    if (res.success) {
+      setIsCreateModalOpen(false);
+      setTeamName('');
+      setTeamDesc('');
+      fetchTeams(); // Refresh the teams after creating a new one
+    }
+  }
+
+  async function handleJoinTeam() {
+    const req = await fetch(`http://127.0.0.1:8000/api/v1/team/join`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Authorization": `${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify({ code: teamCode }) // Use teamCode instead of joinCode
+    });
+
+    const res = await req.json();
+    setMsg(res.message);
+    if (res.success) {
+      setIsJoinModalOpen(false);
+      setTeamCode(''); // Reset teamCode after successful join
+      fetchTeams(); // Refresh the teams after joining a new one
+    }
   }
 
   const generateAbbreviation = (teamName) => {
-    return teamName.slice(0, 2).toUpperCase(); // Take first two letters of team name and uppercase them
+    return teamName.slice(0, 2).toUpperCase(); 
   };
 
   const getRandomColor = () => {
-    return colorArray[Math.floor(Math.random() * colorArray.length)]; // Pick a random color from the array
+    return colorArray[Math.floor(Math.random() * colorArray.length)]; 
   };
 
   return (
     <>
-      <div className="p-6 pt-20">
+      <div className="p-6 pt-20 ">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-semibold">Teams</h1>
           <div>
@@ -102,39 +128,20 @@ function Teams() {
           </div>
         </div>
 
-        {!isAdmin && (
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold mb-2">Classes</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {teams.map((team) => (
-                <TeamCard
-                  key={team._id}
-                  abbreviation={generateAbbreviation(team.name)}
-                  color={getRandomColor()}
-                  title={team.name}
-                  onClick={() => handleTeamClick(generateAbbreviation(team.name), getRandomColor(), team.name)}
-                />
-              ))}
-            </div>
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold mb-2">{isAdmin ? "My Teams" : "Classes"}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {teams.map((team) => (
+              <TeamCard
+                key={team._id}
+                abbreviation={generateAbbreviation(team.teamName)}
+                color={getRandomColor()}
+                title={team.teamName}
+                onClick={() => handleTeamClick(generateAbbreviation(team.teamName), getRandomColor(), team.teamName)}
+              />
+            ))}
           </div>
-        )}
-
-        {isAdmin && (
-          <div>
-            <h2 className="text-lg font-semibold mb-2">My Teams</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {teams.map((team) => (
-                <TeamCard
-                  key={team._id}
-                  abbreviation={generateAbbreviation(team.teamName)}
-                  color={getRandomColor()}
-                  title={team.teamName}
-                  onClick={() => handleTeamClick(generateAbbreviation(team.teamName), getRandomColor(), team.teamName)}
-                />
-              ))}
-            </div>
-          </div>
-        )}
+        </div>
 
         {/* Modals */}
         <Modal
@@ -148,12 +155,17 @@ function Teams() {
             </p>
             <input
               type="text"
+              onChange={(e) => setTeamCode(e.target.value)} // Update teamCode on change
               placeholder="Enter team code"
               className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <button className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors">
+            <button 
+              onClick={handleJoinTeam} // Handle team join
+              className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors"
+            >
               Join Team
             </button>
+            {msg.length !== 0 && <h1 className="text-green-500">{msg}</h1>} {/* Display message */}
           </div>
         </Modal>
 
@@ -178,10 +190,13 @@ function Teams() {
               placeholder="Team description"
               className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <button onClick={handleTeamCreate} className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors">
+            <button 
+              onClick={handleTeamCreate} 
+              className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors"
+            >
               Create Team
             </button>
-            {msg.length !== 0 && <h1>{msg}</h1>}
+            {msg.length !== 0 && <h1 className="text-green-500">{msg}</h1>} {/* Display message */}
           </div>
         </Modal>
       </div>
