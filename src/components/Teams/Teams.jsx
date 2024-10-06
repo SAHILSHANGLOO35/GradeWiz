@@ -73,14 +73,14 @@ function Teams() {
   }
 
   async function handleJoinTeam() {
-    const req = await fetch(`http://127.0.0.1:8000/api/v1/team/join`, {
+    const req = await fetch(`http://127.0.0.1:8000/api/v1/join-team/join`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Accept": "application/json",
         "Authorization": `${localStorage.getItem('token')}`
       },
-      body: JSON.stringify({ code: teamCode }) // Use teamCode instead of joinCode
+      body: JSON.stringify({ teamCode }) // Use teamCode instead of joinCode
     });
 
     const res = await req.json();
