@@ -7,6 +7,7 @@ import GenerateQuestions from "./components/GenerateQuestions";
 import Signup from "./components/Authorization/SignUp";
 import TeamDetailView from "./components/Teams/TeamDetailView";
 import TestResultDashboard from "./components/Teams/Assignments/TestResultDashboard";
+import TestCreate from "./components/Teams/Assignments/TestCreate";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="login" element={<Login />} />
+        <Route path="test-create" element={<TestCreate />} />
         <Route path="signup" element={<Signup />} />
         <Route path="teams" element={<Teams />} />
         <Route path="generateQuestions" element={<GenerateQuestions />} />
