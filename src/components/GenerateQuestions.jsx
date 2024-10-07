@@ -1,21 +1,26 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUpload, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
-import { useNavigate, useLocation } from "react-router-dom";  // Import useNavigate for routing
+import { faUpload, faPencilAlt, faSpinner } from "@fortawesome/free-solid-svg-icons"; // Import spinner icon
+import { useNavigate, useLocation } from "react-router-dom"; 
 import TestCreator from './Teams/Assignments/TestCreate';
+import Loader from "./Loader/Loader.jsx";
 
 const GradeGenerator = () => {
   const [prompt, setPrompt] = useState("Generate 5 questions of 2 marks each and no MCQ type questions, provide only questions no answer. in JSON format");
   const [llmResponse, setLlmResponse] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [testCreated, setTestCreated] = useState(false);
+  const [loading, setLoading] = useState(false); // Loading state
   const location = useLocation();
-  const navigate = useNavigate();  // Initialize the useNavigate hook
+  const navigate = useNavigate();  
   const teamCode = location.state?.teamCode;
-  console.log(teamCode)
+  console.log(teamCode);
+  
 
   function handleGenerate(e) {
     e.preventDefault();
+    setLoading(true);
+    
     const formdata = new FormData();
     formdata.append("prompt", prompt);
     if (selectedFile) {
@@ -29,35 +34,33 @@ const GradeGenerator = () => {
     };
 
     fetch("http://127.0.0.1:5000/summarize", requestOptions)
-  .then((response) => response.json())
-  .then((result) => {
-    // Extract the 'Questions' string
-    let questionsString = result.Questions;
+      .then((response) => response.json())
+      .then((result) => {
+        // Extract and clean up questions string
+        let questionsString = result.Questions.replace(/```json|```/g, "").trim();
 
-    // Remove backticks and 'json' tag
-    questionsString = questionsString.replace(/```json|```/g, "").trim();
-
-    // Parse the cleaned string as JSON
-    const questionsArray = JSON.parse(questionsString);
-
-    // Set the array of question objects into state (unchanged structure)
-    setLlmResponse(questionsArray);
-    setTestCreated(false);
-  })
-  .catch((error) => {
-    console.error('Error:', error);
-  });
-
-
+        try {
+          const questionsArray = JSON.parse(questionsString);
+          setLlmResponse(questionsArray);
+        } catch (error) {
+          console.error("Error parsing questions:", error);
+          setLlmResponse(questionsString); // Fallback in case it's not valid JSON
+        }
+        setTestCreated(false);
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      })
+      .finally(() => setLoading(false)); // End loading after fetch completes
   }
 
   const handleCreateTest = () => {
-    // Navigate to TestCreate component with llmResponse as state
+    setLoading(true); // Show loading when navigating
     navigate("/test-create", { state: { questions: llmResponse, teamCode } });
+    setLoading(false);
   };
 
   const handlePublishTest = (testData) => {
-    // Send the test data to your backend
     fetch("http://127.0.0.1:5000/publishTest", {
       method: "POST",
       headers: {
@@ -72,6 +75,10 @@ const GradeGenerator = () => {
       .catch((error) => console.error('Error publishing test:', error));
   };
 
+  const handleClear = () => {
+    setPrompt(""); // Clear the prompt
+  };
+
   return (
     <div className="grade-generator min-h-screen bg-gradient-to-br from-sky-100 to-sky-300 flex items-center justify-center py-24 px-6 lg:px-8 overflow-hidden">
       <div className="card bg-white shadow-2xl rounded-3xl p-12 max-w-3xl w-full">
@@ -82,7 +89,11 @@ const GradeGenerator = () => {
           </span>
         </h1>
 
-        {!testCreated ? (
+        {loading ? (
+          <div className="flex justify-center items-center mt-12">
+            <Loader />
+          </div>
+        ) : !testCreated ? (
           <>
             <form className="space-y-8" onSubmit={handleGenerate}>
               {/* Upload Section */}
@@ -128,14 +139,13 @@ const GradeGenerator = () => {
                   className="mt-1 p-4 block w-full rounded-lg border border-sky-300 shadow-lg focus:border-sky-500 focus:ring-sky-500 sm:text-sm transition-shadow duration-300 ease-in-out"
                   rows="4"
                   onChange={(e) => setPrompt(e.target.value)}
-                  value={prompt} // Controlled input for prompt
+                  value={prompt}
                   placeholder="Describe the output you want to generate from the PDF..."
                 ></textarea>
               </div>
 
-              {/* Action Buttons */}
               <div className="flex items-center justify-between mt-8">
-                <button type="reset" className="bg-gray-200 text-gray-700 py-2 px-6 rounded-lg">
+                <button onClick={handleClear} type="reset" className="bg-gray-200 text-gray-700 py-2 px-6 rounded-lg">
                   Clear
                 </button>
                 <button type="submit" className="bg-sky-600 text-white py-2 px-6 rounded-lg">
@@ -146,28 +156,30 @@ const GradeGenerator = () => {
 
             {llmResponse && (
               <div className="response-section mt-12 p-6 bg-gray-100 rounded-lg shadow-inner">
-                <h2 className="text-2xl font-bold text-sky-800 mb-4">
-                  Generated Questions:
-                </h2>
-                <p className="text-gray-700 whitespace-pre-wrap">
-                  {typeof llmResponse === 'string' ? llmResponse : JSON.stringify(llmResponse, null, 2)}
-                </p>
-
-                <div className="mt-8 flex gap-4 justify-center">
-                  <button
-                    className="bg-yellow-500 text-white py-2 px-6 rounded-lg"
-                    onClick={handleGenerate}
-                  >
-                    Regenerate Questions
-                  </button>
-                  <button
-                    className="bg-green-500 text-white py-2 px-6 rounded-lg"
-                    onClick={handleCreateTest}
-                  >
-                    Create Test
-                  </button>
-                </div>
+              <h2 className="text-2xl font-bold text-sky-800 mb-4">Generated Questions:</h2>
+              <div className="text-gray-700 whitespace-pre-wrap">
+                {Array.isArray(llmResponse) ? (
+                  <ul>
+                    {llmResponse.map((item, index) => (
+                      <li key={index} className="mb-2">
+                        <strong>Question {index + 1}:</strong><br></br>{item.question}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p>{llmResponse}</p>
+                )}
               </div>
+            
+              <div className="mt-8 flex gap-4 justify-center">
+                <button className="bg-yellow-500 text-white py-2 px-6 rounded-lg" onClick={handleGenerate}>
+                  Regenerate Questions
+                </button>
+                <button className="bg-green-500 text-white py-2 px-6 rounded-lg" onClick={handleCreateTest}>
+                  Create Test
+                </button>
+              </div>
+            </div>            
             )}
           </>
         ) : (
