@@ -2,33 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import AssignmentCard from './Assignments/AssignmentCard';
 
-
-
-// const assignments = [
-//   { id: 1, title: 'Test 1', dueDate: 'Aug 3', timestamp: '8/2 3:23 PM' },
-//   { id: 2, title: 'Test 2', dueDate: 'Aug 8', timestamp: '7/25 11:39 AM' },
-//   { id: 3, title: 'Test 3', dueDate: 'Aug 16', timestamp: '8/9 10:10 AM' },
-//   { id: 4, title: 'Test 4', dueDate: 'Aug 3', timestamp: '8/2 3:23 PM' },
-//   { id: 5, title: 'Test 5', dueDate: 'Aug 8', timestamp: '7/25 11:39 AM' },
-//   { id: 6, title: 'Test 6', dueDate: 'Aug 16', timestamp: '8/9 10:10 AM' }
-// ];
-
-// const members = [
-//   { name: 'Arkan Khan', rollNo: '22101A0049', branch: 'INFT' },
-//   { name: 'Anuj Gill', rollNo: '22101A0057', branch: 'INFT' },
-//   { name: 'Om Alve', rollNo: '22101A0073', branch: 'INFT' },
-//   { name: 'Sahil Shangloo', rollNo: '22101A0027', branch: 'INFT' },
-// ];
-
 function TeamDetailView() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [activeTab, setActiveTab] = useState('posts');
-  const [copySuccess, setCopySuccess] = useState(''); // For displaying copy status
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [copySuccess, setCopySuccess] = useState('');
   const [teamCode, setTeamCode] = useState('');
   const [msg, setMsg] = useState('');
-
+  const [assignments, setAssignments] = useState([]); // State to hold tests (assignments)
+  
+  const navigate = useNavigate();
+  const location = useLocation();
+  
   const { abbreviation: passedAbbreviation, color: passedColor, title } = location.state || {};
 
   useEffect(() => {
@@ -40,26 +24,26 @@ function TeamDetailView() {
     const adminStatus = localStorage.getItem('isAdmin');
     setIsAdmin(adminStatus === 'true');
 
-    // Fetch teams created by admin
+    // Fetch teams and team tests after fetching teamCode
     async function fetchTeams() {
       try {
         const response = await fetch('http://127.0.0.1:8000/api/v1/all-teams', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `${localStorage.getItem('token')}`
-          }
+            'Authorization': `${localStorage.getItem('token')}`,
+          },
         });
 
         const data = await response.json();
-        console.log(data)
         
         if (response.ok) {
-          data.teams.map((team,index) => {
-            if(team.teamName === title){
-              setTeamCode(team.creationCode)
+          data.teams.forEach((team) => {
+            if (team.teamName === title) {
+              setTeamCode(team.creationCode);
+              fetchTests(team.creationCode); // Fetch the tests for the team
             }
-          }) // Set fetched teams in the state
+          });
         } else {
           setMsg(data.message || 'Failed to fetch teams');
         }
@@ -69,16 +53,40 @@ function TeamDetailView() {
       }
     }
 
+    // Fetch tests for the selected team
+    async function fetchTests(teamCode) {
+      try {
+        const response = await fetch('http://127.0.0.1:8000/api/v1/tests/team-tests', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `${localStorage.getItem('token')}`,
+             // Send the teamCode in the request
+          },
+          body: JSON.stringify({ teamCode }),
+        });
+        
+        const data = await response.json();
+
+        if (response.ok) {
+          setAssignments(data.tests); // Set tests in state
+        } else {
+          setMsg(data.message || 'Failed to fetch tests');
+        }
+      } catch (error) {
+        console.error('Error fetching tests:', error);
+        setMsg('Error fetching tests');
+      }
+    }
+
     fetchTeams();
-  }, [msg]);
+  }, [msg, title]);
 
-
-  // Function to handle copying the team code to clipboard
   const copyToClipboard = () => {
     navigator.clipboard.writeText(teamCode)
       .then(() => {
         setCopySuccess('Copied!');
-        setTimeout(() => setCopySuccess(''), 2000); // Clear after 2 seconds
+        setTimeout(() => setCopySuccess(''), 2000);
       })
       .catch(() => setCopySuccess('Failed to copy!'));
   };
@@ -144,38 +152,27 @@ function TeamDetailView() {
       <div className="pt-40 px-6">
         {activeTab === 'posts' && (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {/* {assignments.map(assignment => (
-            <AssignmentCard key={assignment.id} {...assignment} isAdmin={isAdmin} />
-          ))} */}
-        </div>
+            {assignments.length > 0 ? (
+              assignments.map((assignment) => (
+                <AssignmentCard 
+                  key={assignment._id}
+                  title={assignment.title}
+                  dueDate={assignment.dueDate}
+                  timestamp={assignment.createdAt}
+                  isAdmin={isAdmin}
+                  teamId={assignment.team._id}
+                  testId={assignment._id}
+                />
+              ))
+            ) : (
+              <p>No assignments available for this team.</p>
+            )}
+          </div>
         )}
-        
+
         {activeTab === 'members' && (
           <div className="bg-white rounded-lg shadow">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Roll no.</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Branch</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {/* {members.map((member, index) => (
-                  <tr key={index}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{member.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{member.rollNo}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{member.branch}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <button className="text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded transition-colors">
-                        Remove
-                      </button>
-                    </td>
-                  </tr>
-                ))} */}
-              </tbody>
-            </table>
+            {/* Member list */}
           </div>
         )}
       </div>

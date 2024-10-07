@@ -140,7 +140,7 @@ const TestCreator = () => {
       {/* Preview Assignment Card */}
       {testTitle && dueDate && (
         <div className="bg-white shadow-md rounded-lg p-6">
-          <h2 className="text-xl font-bold mb-4">Preview Assignment Card</h2>
+          <h2 className="text-xl font-bold mb-4">Preview Test Details</h2>
           <AssignmentCardPreview
             title={testTitle}
             dueDate={dueDate}
@@ -159,9 +159,6 @@ const AssignmentCardPreview = ({ title, dueDate, timestamp }) => {
       <h3 className="text-lg font-bold">📝 {title}</h3>
       <p className="text-sm text-gray-500">Created: {new Date(timestamp).toLocaleString()}</p>
       <p className="text-sm font-medium">Due: {new Date(dueDate).toLocaleString()}</p>
-      <button className="bg-gray-200 text-gray-700 rounded-md py-2 px-4 w-full mt-4 hover:bg-gray-300">
-        View Test
-      </button>
     </div>
   );
 };

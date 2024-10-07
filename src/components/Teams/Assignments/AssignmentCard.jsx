@@ -10,7 +10,7 @@ const AssignmentCard = ({ title, dueDate, timestamp, isAdmin, teamId, testId }) 
       navigate(`/team/${teamId}/test/${testId}/results`);
     } else {
       // Normal test view for non-admins (can be expanded later)
-      console.log('View Test clicked');
+      navigate(`/team/view-test`,{state: {title}});
     }
   };
 

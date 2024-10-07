@@ -8,6 +8,7 @@ import Signup from "./components/Authorization/SignUp";
 import TeamDetailView from "./components/Teams/TeamDetailView";
 import TestResultDashboard from "./components/Teams/Assignments/TestResultDashboard";
 import TestCreate from "./components/Teams/Assignments/TestCreate";
+import ViewTest from "./components/Teams/Assignments/ViewTest";
 
 function App() {
   return (
@@ -22,6 +23,9 @@ function App() {
         <Route path="/" element={<LandingPage />} /> {/* Use "/" for the root URL */}
         <Route path="/team/:teamId/test/:testId/results" element={<TestResultDashboard />} />
         <Route path="team-detail-view/:abbreviation" element={<TeamDetailView />} /> {/* Keep only the parameterized route */}
+        <Route path="/team/view-test" element={<ViewTest />} /> 
+
+        
       </Routes>
     </div>
   );
