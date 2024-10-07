@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
 const ViewTest = () => {
-    const [questions, setQuestions] = useState([]);  // Store questions with answers here
+    const [questions, setQuestions] = useState([]); // Store questions with answers here
+    const [modalVisible, setModalVisible] = useState(false); // Modal visibility state
+    const [modalMessage, setModalMessage] = useState(''); // Modal message state
     const location = useLocation();
     const title = location.state?.title;
     const teamCode = location.state?.teamCode;
-    
+
     useEffect(() => {
         const fetchTestDetails = async () => {
             try {
@@ -51,24 +53,34 @@ const ViewTest = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    questions: questions,  // Send the questions along with their answers
+                    questions: questions, // Send the questions along with their answers
+                    title
                 }),
             });
-    
+
             if (response.ok) {
                 const data = await response.json();
                 console.log('Submission successful:', data);
-                // Handle success (show notification, redirect, etc.)
+                // Show success modal
+                setModalMessage('Submission successful!'); // Set the modal message
+                setModalVisible(true); // Show the modal
             } else {
                 console.error('Submission failed:', response.status);
-                // Handle error response
+                // Show error modal
+                setModalMessage('Submission failed. Please try again.');
+                setModalVisible(true); // Show the modal
             }
         } catch (error) {
             console.error('Error submitting answers:', error);
-            // Handle network error
+            // Show error modal for network errors
+            setModalMessage('Error submitting answers. Please try again.');
+            setModalVisible(true); // Show the modal
         }
     };
-    
+
+    const closeModal = () => {
+        setModalVisible(false); // Hide the modal
+    };
 
     return (
         <div className="space-y-6">
@@ -96,6 +108,22 @@ const ViewTest = () => {
                     Submit Answers
                 </button>
             </div>
+
+            {/* Modal */}
+            {modalVisible && (
+                <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg">
+                        <h2 className="text-xl font-bold mb-4">Submission Status</h2>
+                        <p>{modalMessage}</p>
+                        <button
+                            onClick={closeModal}
+                            className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
