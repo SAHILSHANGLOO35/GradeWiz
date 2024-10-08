@@ -81,30 +81,7 @@ function TeamDetailView() {
       }
     }
 
-    // Fetch members for the team
-    async function fetchMembers(teamCode) {
-      try {
-        const response = await fetch('http://127.0.0.1:8000/api/v1/team/all-members', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `${localStorage.getItem('token')}`,
-          },
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-          const teamMembers = data.teams.find(team => team._id === teamId)?.members || [];
-          setMembers(teamMembers); // Set members in state
-        } else {
-          setMsg(data.message || 'Failed to fetch members');
-        }
-      } catch (error) {
-        console.error('Error fetching members:', error);
-        setMsg('Error fetching members');
-      }
-    }
+    
 
     fetchTeams();
   }, [msg, title]);
@@ -158,6 +135,34 @@ function TeamDetailView() {
     setIsModalOpen(false); // Close the modal
   };
 
+  
+  // Fetch members for the team
+  async function fetchMembers() {
+    console.log(teamCode)
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/v1/team/all-members', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify({teamCode})
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        const teamMembers = data.team.members;
+        console.log(teamMembers)
+        setMembers(teamMembers); // Set members in state
+      } else {
+        setMsg(data.message || 'Failed to fetch members');
+      }
+    } catch (error) {
+      console.error('Error fetching members:', error);
+      setMsg('Error fetching members');
+    }
+  }
+
   return (
     <div className="bg-gray-50 min-h-screen">
       {/* Modal */}
@@ -204,7 +209,9 @@ function TeamDetailView() {
                 Posts
               </button>
               <button 
-                onClick={() => setActiveTab('members')}
+                onClick={() => {setActiveTab('members');
+                                fetchMembers();
+                }}
                 className={`text-gray-700 pb-1 ${activeTab === 'members' ? 'border-b-2 border-blue-500 font-medium' : ''}`}
               >
                 Members
