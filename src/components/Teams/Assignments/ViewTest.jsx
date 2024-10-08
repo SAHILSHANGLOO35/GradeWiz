@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { ChevronLeft } from 'lucide-react';
 
 const ViewTest = () => {
-    const [questions, setQuestions] = useState([]); // Store questions with answers here
-    const [modalVisible, setModalVisible] = useState(false); // Modal visibility state
-    const [modalMessage, setModalMessage] = useState(''); // Modal message state
+    const [questions, setQuestions] = useState([]);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [modalMessage, setModalMessage] = useState('');
     const location = useLocation();
     const title = location.state?.title;
     const teamCode = location.state?.teamCode;
@@ -22,8 +23,6 @@ const ViewTest = () => {
                 });
 
                 const data = await response.json();
-
-                // Set questions along with an empty answer field for each
                 const formattedQuestions = data.questions.map((q) => ({
                     question: q.question,
                     answer: ''
@@ -35,10 +34,9 @@ const ViewTest = () => {
         };
 
         fetchTestDetails();
-    }, [teamCode]);
+    }, [teamCode, title]);
 
     const handleAnswerChange = (index, value) => {
-        // Update the answer for the specific question based on index
         const updatedQuestions = [...questions];
         updatedQuestions[index].answer = value;
         setQuestions(updatedQuestions);
@@ -49,11 +47,11 @@ const ViewTest = () => {
             const response = await fetch(`http://127.0.0.1:8000/api/v1/tests/submit-answers`, {
                 method: "POST",
                 headers: {
-                    'Authorization': `${localStorage.getItem('token')}`, // Send token from localStorage
+                    'Authorization': `${localStorage.getItem('token')}`,
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    questions: questions, // Send the questions along with their answers
+                    questions: questions,
                     title
                 }),
             });
@@ -61,63 +59,79 @@ const ViewTest = () => {
             if (response.ok) {
                 const data = await response.json();
                 console.log('Submission successful:', data);
-                // Show success modal
-                setModalMessage('Submission successful!'); // Set the modal message
-                setModalVisible(true); // Show the modal
+                setModalMessage('Submission successful!');
+                setModalVisible(true);
             } else {
                 console.error('Submission failed:', response.status);
-                // Show error modal
                 setModalMessage('Submission failed. Please try again.');
-                setModalVisible(true); // Show the modal
+                setModalVisible(true);
             }
         } catch (error) {
             console.error('Error submitting answers:', error);
-            // Show error modal for network errors
             setModalMessage('Error submitting answers. Please try again.');
-            setModalVisible(true); // Show the modal
+            setModalVisible(true);
         }
     };
 
     const closeModal = () => {
-        setModalVisible(false); // Hide the modal
+        setModalVisible(false);
     };
 
     return (
-        <div className="space-y-6">
-            {/* Questions Card */}
-            <div className="bg-white shadow-md rounded-lg p-6 pt-24">
-                <h2 className="text-xl font-bold mb-4">Questions</h2>
-                <div className="space-y-6">
-                    {questions.map((item, index) => (
-                        <div key={index} className="space-y-2">
-                            <p className="font-medium">{item.question}</p>
-                            <textarea
+        <div className="min-h-screen bg-gradient-to-br from-blue-100 via-white to-purple-100 py-12 px-4 pt-24 sm:px-6 lg:px-8">
+            <div className="max-w-4xl mx-auto">
+                <div className="bg-white shadow-2xl rounded-3xl overflow-hidden border border-gray-200">
+                    <div className="bg-gradient-to-r from-blue-600 to-purple-600 py-6 px-6">
+                        <h1 className="text-xl font-bold text-white text-center">{title || 'Test Questions'}</h1>
+                    </div>
+                    
+                    <div className="p-8">
+                    <div className="space-y-8">
+                        {questions.map((item, index) => (
+                            <div key={index} className="space-y-2">
+                            <p className="font-semibold text-gray-800">{index + 1}. {item.question}</p>
+                            <div className="bg-gray-50 border border-gray-300 rounded-md" style={{ height: '80px' }}>
+                                <textarea
                                 placeholder="Enter your answer"
                                 value={item.answer}
-                                rows="1"
                                 onChange={(e) => handleAnswerChange(index, e.target.value)}
-                                className="border border-gray-300 rounded-md p-2 w-full"
-                            />
+                                className="w-full bg-transparent border-none focus:ring-0 focus:outline-none py-0 my-0"
+                                rows="4"
+                                style={{
+                                    minHeight: '70px',  // Minimum height for the textarea
+                                    maxHeight: '60px',  // Maximum height for the textarea
+                                    overflowY: 'auto',   // Enable vertical scrolling
+                                    padding: '4px',  
+                                    margin: '0px' ,
+                                    resize: 'none',  
+                                }}
+                                />
+                            </div>
+                            </div>
+                        ))}
+                    </div>
+
+
+                        <div className="mt-10 flex justify-center">
+                            <button
+                                onClick={handleSubmit}
+                                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-full hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            >
+                                Submit Answers
+                            </button>
                         </div>
-                    ))}
+                    </div>
                 </div>
-                <button
-                    onClick={handleSubmit}
-                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
-                >
-                    Submit Answers
-                </button>
             </div>
 
-            {/* Modal */}
             {modalVisible && (
-                <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg">
-                        <h2 className="text-xl font-bold mb-4">Submission Status</h2>
-                        <p>{modalMessage}</p>
+                <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
+                    <div className="bg-white p-8 rounded-lg shadow-2xl max-w-md w-full">
+                        <h2 className="text-2xl font-bold mb-4 text-gray-800">Submission Status</h2>
+                        <p className="text-lg text-gray-600">{modalMessage}</p>
                         <button
                             onClick={closeModal}
-                            className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+                            className="mt-6 w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-full hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                         >
                             Close
                         </button>

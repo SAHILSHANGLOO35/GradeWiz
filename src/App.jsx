@@ -9,6 +9,7 @@ import TeamDetailView from "./components/Teams/TeamDetailView";
 import TestResultDashboard from "./components/Teams/Assignments/TestResultDashboard";
 import TestCreate from "./components/Teams/Assignments/TestCreate";
 import ViewTest from "./components/Teams/Assignments/ViewTest";
+import ViewTestResponse from "./components/Teams/Assignments/ViewTestResponse";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="signup" element={<Signup />} />
         <Route path="teams" element={<Teams />} />
         <Route path="generateQuestions" element={<GenerateQuestions />} />
+        <Route path="/team/:teamId/test/:testId/results/:userId" element={<ViewTestResponse />} />
         <Route path="/" element={<LandingPage />} /> {/* Use "/" for the root URL */}
         <Route path="/team/:teamId/test/:testId/results" element={<TestResultDashboard />} />
         <Route path="team-detail-view/:abbreviation" element={<TeamDetailView />} /> {/* Keep only the parameterized route */}
