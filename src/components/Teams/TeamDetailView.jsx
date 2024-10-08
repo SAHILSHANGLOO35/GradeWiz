@@ -69,7 +69,7 @@ function TeamDetailView() {
         });
 
         const data = await response.json();
-
+        localStorage.setItem("teamCode",teamCode)
         if (response.ok) {
           setAssignments(data.tests); // Set tests in state
         } else {

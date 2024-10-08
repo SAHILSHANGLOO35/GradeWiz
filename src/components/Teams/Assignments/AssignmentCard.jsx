@@ -7,7 +7,7 @@ const AssignmentCard = ({ title, dueDate, timestamp, isAdmin, teamId, testId }) 
   const handleClick = () => {
     if (isAdmin) {
       // Navigate to the results page with the teamId and testId in the URL
-      navigate(`/team/${teamId}/test/${testId}/results`);
+      navigate(`/team/${teamId}/test/${testId}/results`, {state: {title}});
     } else {
       // Normal test view for non-admins (can be expanded later)
       navigate(`/team/view-test`,{state: {title}});
