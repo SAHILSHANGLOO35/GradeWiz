@@ -84,7 +84,6 @@ function Signup() {
                   value={formData.name || ""}
                   onChange={handleChange}
                   className="block w-full py-3 px-0 text-sm text-gray-900 bg-transparent border-b-2 border-gray-300 focus:outline-none focus:ring-0 focus:border-blue-600"
-                  placeholder=" "
                   required
                 />
                 <label

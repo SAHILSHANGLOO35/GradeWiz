@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
+import Loader from '../../Loader/Loader.jsx';
 
 const ViewTest = () => {
     const [questions, setQuestions] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
+    const [loading, setLoading] = useState(false);  // New loading state
     const location = useLocation();
     const title = location.state?.title;
     const teamCode = location.state?.teamCode;
@@ -43,6 +45,7 @@ const ViewTest = () => {
     };
 
     const handleSubmit = async () => {
+        setLoading(true);  // Show the loader when submission starts
         try {
             const response = await fetch(`http://127.0.0.1:8000/api/v1/tests/submit-answers`, {
                 method: "POST",
@@ -60,15 +63,15 @@ const ViewTest = () => {
                 const data = await response.json();
                 console.log('Submission successful:', data);
                 setModalMessage('Submission successful!');
-                setModalVisible(true);
             } else {
                 console.error('Submission failed:', response.status);
                 setModalMessage('Submission failed. Please try again.');
-                setModalVisible(true);
             }
         } catch (error) {
             console.error('Error submitting answers:', error);
             setModalMessage('Error submitting answers. Please try again.');
+        } finally {
+            setLoading(false);  // Hide the loader when submission ends
             setModalVisible(true);
         }
     };
@@ -81,46 +84,56 @@ const ViewTest = () => {
         <div className="min-h-screen bg-gradient-to-br from-blue-100 via-white to-purple-100 py-12 px-4 pt-24 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto">
                 <div className="bg-white shadow-2xl rounded-3xl overflow-hidden border border-gray-200">
+                    {/* Heading Section */}
                     <div className="bg-gradient-to-r from-blue-600 to-purple-600 py-6 px-6">
                         <h1 className="text-xl font-bold text-white text-center">{title || 'Test Questions'}</h1>
                     </div>
-                    
-                    <div className="p-8">
-                    <div className="space-y-8">
-                        {questions.map((item, index) => (
-                            <div key={index} className="space-y-2">
-                            <p className="font-semibold text-gray-800">{index + 1}. {item.question}</p>
-                            <div className="bg-gray-50 border border-gray-300 rounded-md" style={{ height: '80px' }}>
-                                <textarea
-                                placeholder="Enter your answer"
-                                value={item.answer}
-                                onChange={(e) => handleAnswerChange(index, e.target.value)}
-                                className="w-full bg-transparent border-none focus:ring-0 focus:outline-none py-0 my-0"
-                                rows="4"
-                                style={{
-                                    minHeight: '70px',  // Minimum height for the textarea
-                                    maxHeight: '60px',  // Maximum height for the textarea
-                                    overflowY: 'auto',   // Enable vertical scrolling
-                                    padding: '4px',  
-                                    margin: '0px' ,
-                                    resize: 'none',  
-                                }}
-                                />
-                            </div>
-                            </div>
-                        ))}
-                    </div>
 
-
-                        <div className="mt-10 flex justify-center">
-                            <button
-                                onClick={handleSubmit}
-                                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-full hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                            >
-                                Submit Answers
-                            </button>
+                    {/* Loader Section */}
+                    {loading && (
+                        <div className="flex justify-center items-center p-8">
+                            <Loader /> {/* Display loader when loading is true */}
                         </div>
-                    </div>
+                    )}
+
+                    {/* Question and Answer Section */}
+                    {!loading && (
+                        <div className="p-8">
+                            <div className="space-y-8">
+                                {questions.map((item, index) => (
+                                    <div key={index} className="space-y-2">
+                                        <p className="font-semibold text-gray-800">{index + 1}. {item.question}</p>
+                                        <div className="bg-gray-50 border border-gray-300 rounded-md" style={{ height: '80px' }}>
+                                            <textarea
+                                                placeholder="Enter your answer"
+                                                value={item.answer}
+                                                onChange={(e) => handleAnswerChange(index, e.target.value)}
+                                                className="w-full bg-transparent border-none focus:ring-0 focus:outline-none py-0 my-0"
+                                                rows="4"
+                                                style={{
+                                                    minHeight: '70px',  // Minimum height for the textarea
+                                                    maxHeight: '60px',  // Maximum height for the textarea
+                                                    overflowY: 'auto',   // Enable vertical scrolling
+                                                    padding: '4px',
+                                                    margin: '0px',
+                                                    resize: 'none',
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="mt-10 flex justify-center">
+                                <button
+                                    onClick={handleSubmit}
+                                    className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-full hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                >
+                                    Submit Answers
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 
