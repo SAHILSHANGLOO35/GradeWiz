@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { MdDensityMedium } from "react-icons/md";
 import logo from "/logo.png";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   // Manage the state for menu toggle (especially for mobile devices)
   const [toggle, setToggle] = useState(false);
   // State to track if the user has scrolled
   const [scrolled, setScrolled] = useState(false);
-
+  const navigate = useNavigate();
   // Update the scrolled state based on scroll position
   const handleScroll = () => {
     if (window.scrollY > 0) {
@@ -25,6 +26,11 @@ const Navbar = () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+
+  function handleLogout() {
+    localStorage.clear();
+    navigate("/login")
+  }
 
   return (
     <div>
@@ -86,6 +92,14 @@ const Navbar = () => {
                 className="font-cabin font-bold text-md relative uppercase tracking-wide text-[#5f6368] lg:text-[#5f6368] hover:before:scale-x-100 before:content-[''] before:bg-[#5f6368] lg:before:bg-[#5f6368] before:absolute before:bottom-0 before:left-0 before:w-full before:h-[2px] before:transform before:scale-x-0 before:origin-right before:transition-transform before:duration-300 hover:before:origin-left"
               >
                 CONTACT
+              </a>
+            </li>
+            <li>
+              <a
+                onClick={handleLogout}
+                className="font-cabin font-bold cursor-pointer text-md relative uppercase tracking-wide text-[#5f6368] lg:text-[#5f6368] hover:before:scale-x-100 before:content-[''] before:bg-[#5f6368] lg:before:bg-[#5f6368] before:absolute before:bottom-0 before:left-0 before:w-full before:h-[2px] before:transform before:scale-x-0 before:origin-right before:transition-transform before:duration-300 hover:before:origin-left"
+              >
+                Logout
               </a>
             </li>
           </ul>

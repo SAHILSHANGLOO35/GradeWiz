@@ -13,7 +13,7 @@ const ViewTestResponse = () => {
   const location = useLocation();
   const title = location.state?.title;
   const username = location.state?.username;
-  console.log(title)
+
   useEffect(() => {
     const fetchTestResults = async () => {
       setIsLoading(true);
@@ -22,7 +22,7 @@ const ViewTestResponse = () => {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}` // Assuming you store the token in localStorage
           },
-          body: {username, testName: title}
+          body: { username, testName: title }
         });
         setTestResults(response.data.answers);
         setTotalGrade(response.data.totalGrade);
@@ -77,7 +77,8 @@ const ViewTestResponse = () => {
                 <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-md border-l-4 border-blue-400">
                   <p className="font-semibold text-blue-800">Grade: {item.grade}</p>
                   <p className="font-semibold text-blue-800 mt-2">Feedback:</p>
-                  <p className="text-purple-800">{item.feedback}</p>
+                  {/* Render feedback as HTML */}
+                  <div className="text-purple-800" dangerouslySetInnerHTML={{ __html: item.feedback }} />
                 </div>
               </div>
             ))}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import Loader from '../../Loader/Loader.jsx';
 
@@ -7,16 +7,46 @@ const ViewTest = () => {
     const [questions, setQuestions] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
-    const [loading, setLoading] = useState(false);  // New loading state
+    const [loading, setLoading] = useState(false);
+    const [alreadyAttempted, setAlreadyAttempted] = useState(false);
     const location = useLocation();
+    const navigate = useNavigate();
     const title = location.state?.title;
     const teamCode = location.state?.teamCode;
+    const userId = localStorage.getItem('userId'); // Assuming userId is stored in localStorage
+
+    console.log("View result")
 
     useEffect(() => {
+        const checkTestAttempt = async () => {
+            try {
+                const response = await fetch('http://127.0.0.1:8000/api/v1/tests/check-attempt', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `${localStorage.getItem('token')}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ testName: title}),
+                });
+
+                const data = await response.json();
+                console.log(data)
+                if (response.ok && data.message === 'You have already attempted the test.') {
+                    setAlreadyAttempted(true);
+                    setModalMessage(data.message);
+                    setModalVisible(true);
+                } else {
+                    fetchTestDetails();
+                }
+            } catch (error) {
+                console.error('Error checking test attempt:', error);
+            }
+        };
+
         const fetchTestDetails = async () => {
             try {
-                const response = await fetch(`http://127.0.0.1:8000/api/v1/tests/questions-by-title`, {
-                    method: "POST",
+                const response = await fetch('http://127.0.0.1:8000/api/v1/tests/questions-by-title', {
+                    method: 'POST',
                     headers: {
                         'Authorization': `${localStorage.getItem('token')}`,
                         'Content-Type': 'application/json',
@@ -35,8 +65,8 @@ const ViewTest = () => {
             }
         };
 
-        fetchTestDetails();
-    }, [teamCode, title]);
+        checkTestAttempt();
+    }, [teamCode, title, userId]);
 
     const handleAnswerChange = (index, value) => {
         const updatedQuestions = [...questions];
@@ -45,16 +75,23 @@ const ViewTest = () => {
     };
 
     const handleSubmit = async () => {
-        setLoading(true);  // Show the loader when submission starts
+        const emptyAnswers = questions.some((q) => q.answer.trim() === '');
+        if (emptyAnswers) {
+            setModalMessage('Please fill in all answers before submitting.');
+            setModalVisible(true);
+            return;
+        }
+
+        setLoading(true);
         try {
-            const response = await fetch(`http://127.0.0.1:8000/api/v1/tests/submit-answers`, {
-                method: "POST",
+            const response = await fetch('http://127.0.0.1:8000/api/v1/tests/submit-answers', {
+                method: 'POST',
                 headers: {
                     'Authorization': `${localStorage.getItem('token')}`,
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    questions: questions,
+                    questions,
                     title
                 }),
             });
@@ -71,13 +108,18 @@ const ViewTest = () => {
             console.error('Error submitting answers:', error);
             setModalMessage('Error submitting answers. Please try again.');
         } finally {
-            setLoading(false);  // Hide the loader when submission ends
+            setLoading(false);
             setModalVisible(true);
         }
     };
 
     const closeModal = () => {
         setModalVisible(false);
+        if (alreadyAttempted) {
+            const navigate = useNavigate();
+            navigate(-1);
+            // Redirect the user back if they already attempted the test
+        }
     };
 
     return (
@@ -97,7 +139,7 @@ const ViewTest = () => {
                     )}
 
                     {/* Question and Answer Section */}
-                    {!loading && (
+                    {!loading && !alreadyAttempted && (
                         <div className="p-8">
                             <div className="space-y-8">
                                 {questions.map((item, index) => (
@@ -111,13 +153,14 @@ const ViewTest = () => {
                                                 className="w-full bg-transparent border-none focus:ring-0 focus:outline-none py-0 my-0"
                                                 rows="4"
                                                 style={{
-                                                    minHeight: '70px',  // Minimum height for the textarea
-                                                    maxHeight: '60px',  // Maximum height for the textarea
-                                                    overflowY: 'auto',   // Enable vertical scrolling
+                                                    minHeight: '70px',
+                                                    maxHeight: '60px',
+                                                    overflowY: 'auto',
                                                     padding: '4px',
                                                     margin: '0px',
                                                     resize: 'none',
                                                 }}
+                                                required
                                             />
                                         </div>
                                     </div>
@@ -146,7 +189,7 @@ const ViewTest = () => {
                             onClick={closeModal}
                             className="mt-6 w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-full hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                         >
-                            Close
+                            {alreadyAttempted ? 'Go Back' : 'Close'}
                         </button>
                     </div>
                 </div>

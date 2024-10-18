@@ -6,7 +6,7 @@ import TestCreator from './Teams/Assignments/TestCreate';
 import Loader from "./Loader/Loader.jsx";
 
 const GradeGenerator = () => {
-  const [prompt, setPrompt] = useState("Generate 5 questions of 2 marks each and no MCQ type questions, provide only questions no answer. in JSON format");
+  const [prompt, setPrompt] = useState("");
   const [llmResponse, setLlmResponse] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [testCreated, setTestCreated] = useState(false);

@@ -62,7 +62,7 @@ function Login() {
                   onChange={() => setUserType("admin")}
                   className="mr-2"
                 />
-                Admin
+                Faculty
               </label>
             </div>
             <div className="relative my-6">

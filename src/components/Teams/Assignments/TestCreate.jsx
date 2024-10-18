@@ -7,7 +7,8 @@ const TestCreator = () => {
   const [answers, setAnswers] = useState({});
   const [backendMessage, setBackendMessage] = useState('');
   const [showModal, setShowModal] = useState(false);
-
+  const [checkingLevel, setCheckingLevel] = useState('Medium'); // Default to 'Medium'
+  console.log(checkingLevel)
   const location = useLocation();
   const questions = location.state?.questions;
   const teamCode = location.state?.teamCode;
@@ -37,7 +38,8 @@ const TestCreator = () => {
       title: testTitle,
       duedate: dueDate,
       questions: questionsArray,
-      teamCode
+      teamCode,
+      gradingLevel: checkingLevel
     };
     
     try {
@@ -80,7 +82,8 @@ const TestCreator = () => {
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-700">Test Title</label>
                 <input
-                  type="text" required
+                  type="text"
+                  required
                   value={testTitle}
                   onChange={(e) => setTestTitle(e.target.value)}
                   placeholder="Enter test title"
@@ -97,6 +100,49 @@ const TestCreator = () => {
                     onChange={(e) => setDueDate(e.target.value)}
                     className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 pr-10"
                   />
+                </div>
+              </div>
+            </div>
+
+            {/* Checking Level */}
+            <div className="space-y-4">
+              <h2 className="text-xl font-bold text-gray-800">Select Checking Level</h2>
+              <div className="space-y-2">
+                <div className="flex items-center">
+                  <input
+                    type="radio"
+                    id="lenient"
+                    name="checkingLevel"
+                    value="Lenient"
+                    checked={checkingLevel === 'Lenient'}
+                    onChange={() => setCheckingLevel('Lenient')}
+                    className="mr-2"
+                  />
+                  <label htmlFor="lenient" className="text-gray-700">Lenient</label>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    type="radio"
+                    id="medium"
+                    name="checkingLevel"
+                    value="Medium"
+                    checked={checkingLevel === 'Medium'}
+                    onChange={() => setCheckingLevel('Medium')}
+                    className="mr-2"
+                  />
+                  <label htmlFor="medium" className="text-gray-700">Medium</label>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    type="radio"
+                    id="hard"
+                    name="checkingLevel"
+                    value="Hard"
+                    checked={checkingLevel === 'Hard'}
+                    onChange={() => setCheckingLevel('Hard')}
+                    className="mr-2"
+                  />
+                  <label htmlFor="hard" className="text-gray-700">Hard</label>
                 </div>
               </div>
             </div>
