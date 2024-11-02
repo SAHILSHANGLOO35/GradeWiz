@@ -70,7 +70,7 @@ function Signup() {
                 onChange={() => setUserType("admin")}
                 className="mr-2"
               />
-              Admin
+              Faculty
             </label>
           </div>
 

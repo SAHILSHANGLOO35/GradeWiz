@@ -16,7 +16,6 @@ const GradeGenerator = () => {
   const teamCode = location.state?.teamCode;
   console.log(teamCode);
   
-
   function handleGenerate(e) {
     e.preventDefault();
     setLoading(true);
@@ -175,9 +174,11 @@ const GradeGenerator = () => {
                 <button className="bg-yellow-500 text-white py-2 px-6 rounded-lg" onClick={handleGenerate}>
                   Regenerate Questions
                 </button>
-                <button className="bg-green-500 text-white py-2 px-6 rounded-lg" onClick={handleCreateTest}>
-                  Create Test
-                </button>
+                {llmResponse !== "Please provide a prompt specifically for generating questions only." && (
+                  <button className="bg-green-500 text-white py-2 px-6 rounded-lg" onClick={handleCreateTest}>
+                    Create Test
+                  </button>
+                )}
               </div>
             </div>            
             )}
