@@ -4,12 +4,9 @@ import logo from "/logo.png";
 import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
-  // Manage the state for menu toggle (especially for mobile devices)
   const [toggle, setToggle] = useState(false);
-  // State to track if the user has scrolled
   const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
-  // Update the scrolled state based on scroll position
   const handleScroll = () => {
     if (window.scrollY > 0) {
       setScrolled(true);
@@ -19,9 +16,7 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    // Attach the scroll event listener
     window.addEventListener("scroll", handleScroll);
-    // Cleanup event listener on component unmount
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
@@ -50,7 +45,6 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Hamburger icon for mobile view */}
         <MdDensityMedium
           className="lg:hidden text-black text-3xl cursor-pointer"
           onClick={() => setToggle(!toggle)}
@@ -64,7 +58,7 @@ const Navbar = () => {
           <ul className="flex flex-col lg:flex-row lg:space-x-8 space-y-4 lg:space-y-0">
             <li>
               <a
-                href=""
+                href="/"
                 className="font-cabin font-bold text-md relative uppercase tracking-wide text-[#5f6368] lg:text-[#5f6368] hover:before:scale-x-100 before:content-[''] before:bg-[#5f6368] lg:before:bg-[#5f6368] before:absolute before:bottom-0 before:left-0 before:w-full before:h-[2px] before:transform before:scale-x-0 before:origin-right before:transition-transform before:duration-300 hover:before:origin-left"
               >
                 HOME
@@ -76,22 +70,6 @@ const Navbar = () => {
                 className="text-[#5f6368] font-cabin text-md font-bold relative uppercase tracking-wide lg:text-[#5f6368] hover:before:scale-x-100 before:content-[''] before:bg-[#5f6368] lg:before:bg-[#5f6368] before:absolute before:bottom-0 before:left-0 before:w-full before:h-[2px] before:transform before:scale-x-0 before:origin-right before:transition-transform before:duration-300 hover:before:origin-left"
               >
                 SIGN IN
-              </a>
-            </li>
-            <li>
-              <a
-                href="/about"
-                className="font-cabin font-bold text-md relative uppercase tracking-wide text-[#5f6368] lg:text-[#5f6368] hover:before:scale-x-100 before:content-[''] before:bg-[#5f6368] lg:before:bg-[#5f6368] before:absolute before:bottom-0 before:left-0 before:w-full before:h-[2px] before:transform before:scale-x-0 before:origin-right before:transition-transform before:duration-300 hover:before:origin-left"
-              >
-                ABOUT US
-              </a>
-            </li>
-            <li>
-              <a
-                href="/contact"
-                className="font-cabin font-bold text-md relative uppercase tracking-wide text-[#5f6368] lg:text-[#5f6368] hover:before:scale-x-100 before:content-[''] before:bg-[#5f6368] lg:before:bg-[#5f6368] before:absolute before:bottom-0 before:left-0 before:w-full before:h-[2px] before:transform before:scale-x-0 before:origin-right before:transition-transform before:duration-300 hover:before:origin-left"
-              >
-                CONTACT
               </a>
             </li>
             <li>

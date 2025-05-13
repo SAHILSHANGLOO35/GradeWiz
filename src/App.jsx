@@ -22,12 +22,10 @@ function App() {
         <Route path="teams" element={<Teams />} />
         <Route path="generateQuestions" element={<GenerateQuestions />} />
         <Route path="/team/:teamId/test/:testId/results/:userId" element={<ViewTestResponse />} />
-        <Route path="/" element={<LandingPage />} /> {/* Use "/" for the root URL */}
+        <Route path="/" element={<LandingPage />} />
         <Route path="/team/:teamId/test/:testId/results" element={<TestResultDashboard />} />
-        <Route path="team-detail-view/:abbreviation" element={<TeamDetailView />} /> {/* Keep only the parameterized route */}
+        <Route path="team-detail-view/:abbreviation" element={<TeamDetailView />} />
         <Route path="/team/view-test" element={<ViewTest />} /> 
-
-        
       </Routes>
     </div>
   );

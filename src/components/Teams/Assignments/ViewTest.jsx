@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ChevronLeft } from 'lucide-react';
 import Loader from '../../Loader/Loader.jsx';
 
 const ViewTest = () => {
@@ -118,7 +117,6 @@ const ViewTest = () => {
         if (alreadyAttempted) {
             const navigate = useNavigate();
             navigate(-1);
-            // Redirect the user back if they already attempted the test
         }
     };
 

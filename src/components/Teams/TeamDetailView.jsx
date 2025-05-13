@@ -11,8 +11,7 @@ function TeamDetailView() {
   const [assignments, setAssignments] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [memberToRemove, setMemberToRemove] = useState(null);
-  const [members, setMembers] = useState([]); // State for members
-
+  const [members, setMembers] = useState([]);
   const navigate = useNavigate();
   const location = useLocation();
   const { abbreviation: passedAbbreviation, color: passedColor, title } = location.state || {};
@@ -26,7 +25,6 @@ function TeamDetailView() {
     const adminStatus = localStorage.getItem('isAdmin');
     setIsAdmin(adminStatus === 'true');
 
-    // Fetch teams and team tests after fetching teamCode
     async function fetchTeams() {
       try {
         const response = await fetch('http://127.0.0.1:8000/api/v1/all-teams', {
@@ -43,8 +41,8 @@ function TeamDetailView() {
           data.teams.forEach((team) => {
             if (team.teamName === title) {
               setTeamCode(team.creationCode);
-              fetchTests(team.creationCode); // Fetch the tests for the team
-              fetchMembers(team._id); // Fetch members for the team
+              fetchTests(team.creationCode);
+              fetchMembers(team._id);
             }
           });
         } else {
@@ -56,7 +54,6 @@ function TeamDetailView() {
       }
     }
 
-    // Fetch tests for the selected team
     async function fetchTests(teamCode) {
       try {
         const response = await fetch('http://127.0.0.1:8000/api/v1/tests/team-tests', {
@@ -71,7 +68,7 @@ function TeamDetailView() {
         const data = await response.json();
         localStorage.setItem("teamCode",teamCode)
         if (response.ok) {
-          setAssignments(data.tests); // Set tests in state
+          setAssignments(data.tests);
         } else {
           setMsg(data.message || 'Failed to fetch tests');
         }
@@ -80,8 +77,6 @@ function TeamDetailView() {
         setMsg('Error fetching tests');
       }
     }
-
-    
 
     fetchTeams();
   }, [msg, title]);
@@ -96,12 +91,12 @@ function TeamDetailView() {
   };
 
   const openModal = (member) => {
-    setMemberToRemove(member); // Set the member to be removed
-    setIsModalOpen(true); // Open the modal
+    setMemberToRemove(member);
+    setIsModalOpen(true);
   };
 
   const closeModal = () => {
-    setIsModalOpen(false); // Close the modal
+    setIsModalOpen(false);
   };
 
   const handleRemove = async () => {
@@ -114,15 +109,14 @@ function TeamDetailView() {
           'Authorization': `${localStorage.getItem('token')}`,
         },
         body: JSON.stringify({
-          teamId: memberToRemove.teamId, // Pass the team ID
-          memberId: memberToRemove._id, // Pass the member ID
+          teamId: memberToRemove.teamId,
+          memberId: memberToRemove._id,
         }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        // Update members after successful removal
         setMembers(prevMembers => prevMembers.filter(member => member._id !== memberToRemove._id));
         setMsg(data.message || 'Member removed successfully');
       } else {
@@ -132,11 +126,10 @@ function TeamDetailView() {
       console.error('Error removing member:', error);
       setMsg('Error removing member');
     }
-    setIsModalOpen(false); // Close the modal
+    setIsModalOpen(false);
   };
 
-  
-  // Fetch members for the team
+
   async function fetchMembers() {
     console.log(teamCode)
     try {
@@ -153,7 +146,7 @@ function TeamDetailView() {
       if (response.ok) {
         const teamMembers = data.team.members;
         console.log(teamMembers)
-        setMembers(teamMembers); // Set members in state
+        setMembers(teamMembers);
       } else {
         setMsg(data.message || 'Failed to fetch members');
       }
@@ -165,7 +158,6 @@ function TeamDetailView() {
 
   return (
     <div className="bg-gray-50 min-h-screen">
-      {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg">
@@ -189,7 +181,6 @@ function TeamDetailView() {
         </div>
       )}
 
-      {/* Secondary Navbar */}
       <div className="fixed top-16 w-full z-10 flex items-center p-4 bg-white border-b border-gray-200 shadow-sm">
         <div 
           style={{ backgroundColor: passedColor }} 
@@ -220,7 +211,6 @@ function TeamDetailView() {
           </div>
         </div>
 
-        {/* Display Team Code with Copy Button */}
         <div className="ml-8 text-gray-500 flex items-center space-x-2">
           <span className="text-sm font-medium">Team Code: </span>
           <span className="text-blue-600 font-semibold">{teamCode}</span>
@@ -246,7 +236,6 @@ function TeamDetailView() {
         )}
       </div>
 
-      {/* Content Area */}
       <div className="pt-40 px-6">
       {activeTab === 'posts' && (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -255,7 +244,7 @@ function TeamDetailView() {
                 <AssignmentCard 
                   key={assignment._id}
                   title={assignment.title}
-                  dueDate={assignment.dueDate}
+                  dueDate={assignment.duedate}
                   timestamp={assignment.createdAt}
                   isAdmin={isAdmin}
                   teamId={assignment.team._id}
@@ -268,7 +257,6 @@ function TeamDetailView() {
           </div>
         )}
 
-        {/* Members Section */}
         {activeTab === 'members' && (
           <div className="bg-white rounded-lg shadow overflow-hidden">
             <table className="min-w-full divide-y divide-gray-200">

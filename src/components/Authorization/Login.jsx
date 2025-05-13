@@ -5,7 +5,7 @@ import { AiOutlineUnlock } from "react-icons/ai";
 import axios from "axios";
 
 function Login() {
-  const [userType, setUserType] = useState("user"); // Default user type
+  const [userType, setUserType] = useState("user");
   const [formData, setFormData] = useState({ email: "", password: "" });
   const navigate = useNavigate();
 
@@ -22,13 +22,12 @@ function Login() {
 
     try {
       const response = await axios.post(url, formData);
-      const { token } = response.data; // Get token from response
-      localStorage.setItem("token", token); // Save token to local storage
+      const { token } = response.data;
+      localStorage.setItem("token", token);
 
-      // Set isAdmin based on user type
       localStorage.setItem("isAdmin", userType === "admin");
 
-      navigate("/teams"); // Redirect to home page
+      navigate("/teams");
     } catch (error) {
       console.error("An error occurred during login:", error);
       alert(error.response?.data?.message || "Login failed. Please try again.");
